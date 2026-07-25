@@ -53,7 +53,9 @@
             display: flex;
             flex-direction: column;
             box-shadow: 8px 0 25px rgba(0,0,0,0.9);
-            z-index: 20;
+            z-index: 500;
+            position: relative;
+            flex-shrink: 0;
         }
 
         .sidebar-header {
@@ -119,6 +121,8 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            position: relative;
+            z-index: 1;
         }
 
         .topbar {
@@ -275,7 +279,7 @@
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0,0,0,0.85);
-            z-index: 100;
+            z-index: 1000;
             justify-content: center;
             align-items: center;
         }
@@ -511,18 +515,14 @@
         </div>
     </div>
 
-    <!-- MOTEUR DE CONNEXION SUPABASE ET LOGIQUE ERP -->
+    <!-- MOTEUR JS -->
     <script>
-        /* ==================================================================
-           CONFIGURATIONS & IDENTIFIANTS SUPABASE
-           ================================================================== */
         const SUPABASE_URL = 'https://keeqmcmbcnltsgizwsrz.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtlZXFtY21iY25sdHNnaXp3c3J6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ5OTQwMzEsImV4cCI6MjEwMDU3MDAzMX0.g6sJKXMJ9EMCIaqyFpcMIHMW9FWmNanLSZOONS3mySY'; // Remplacez par votre clé eyJ...
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtlZXFtY21iY25sdHNnaXp3c3J6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ5OTQwMzEsImV4cCI6MjEwMDU3MDAzMX0.g6sJKXMJ9EMCIaqyFpcMIHMW9FWmNanLSZOONS3mySY';
         
         let supabase = null;
         let isOnline = false;
 
-        // Structure mémoire unifiée
         let store = {
             houses: [],
             mercuriale: [],
@@ -532,7 +532,6 @@
             population: []
         };
 
-        // Mapping exact des tables SQL Supabase
         const tableMapping = {
             houses: 'noble_houses',
             mercuriale: 'market_prices',
@@ -544,12 +543,13 @@
 
         let currentContext = { entity: '', id: null };
 
-        // INITIALISATION SÉCURISÉE DE LA CONNEXION
-        document.addEventListener('DOMContentLoaded', async () => {
-            // Navigation
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.addEventListener('click', function() {
+        // Attachement direct de la navigation
+        function bindNavigation() {
+            const items = document.querySelectorAll('.nav-item');
+            items.forEach(item => {
+                item.onclick = function() {
                     const targetViewId = this.getAttribute('data-target');
+                    
                     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
                     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
                     
@@ -558,36 +558,38 @@
                         targetView.classList.add('active');
                         this.classList.add('active');
                     }
-                });
+                };
             });
+        }
 
-            document.getElementById('modal-form').addEventListener('submit', handleFormSubmit);
+        window.onload = function() {
+            bindNavigation();
 
-            // Initialisation Supabase
+            const modalForm = document.getElementById('modal-form');
+            if (modalForm) {
+                modalForm.onsubmit = handleFormSubmit;
+            }
+
             if (window.supabase && SUPABASE_KEY.startsWith('eyJ')) {
                 try {
                     supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
                     isOnline = true;
                     document.getElementById('db-status').className = 'db-status-banner db-status-online';
-                    document.getElementById('db-status-text').innerHTML = 'Mode : <strong>PostgreSQL distant (Supabase Connecté)</strong>';
+                    document.getElementById('db-status-text').innerHTML = 'Mode : <strong>PostgreSQL distant (Connecté)</strong>';
                 } catch(e) {
-                    console.warn("Connexion Supabase échouée, bascule locale.", e);
+                    console.warn("Connexion Supabase échouée", e);
                 }
             } else {
                 document.getElementById('db-status').className = 'db-status-banner db-status-local';
-                document.getElementById('db-status-text').innerHTML = 'Mode : <strong>Mémoire Locale (Clé Supabase non renseignée)</strong>';
+                document.getElementById('db-status-text').innerHTML = 'Mode : <strong>Mémoire Locale</strong>';
             }
 
-            await syncWithSupabase();
-        });
+            syncWithSupabase();
+        };
 
-        /* ==================================================================
-           SYNCHRONISATION ET LECTURE DEPUIS SUPABASE (SELECT)
-           ================================================================== */
         async function syncWithSupabase() {
             if (isOnline && supabase) {
                 try {
-                    // Charger parallèlement les données de toutes les tables PostgreSQL
                     const [resHouses, resMerc, resTaxes, resProps, resDecrees, resPop] = await Promise.all([
                         supabase.from('noble_houses').select('*'),
                         supabase.from('market_prices').select('*'),
@@ -604,16 +606,14 @@
                     if (!resDecrees.error) store.decrees = resDecrees.data || [];
                     if (!resPop.error) store.population = resPop.data || [];
 
-                    // Sauvegarde tampon locale
                     localStorage.setItem('skarnfell_data', JSON.stringify(store));
                 } catch (err) {
-                    console.error("Erreur de synchronisation Supabase:", err);
+                    console.error("Erreur DB:", err);
                 }
             } else {
-                // Fallback LocalStorage si Supabase est hors ligne
                 const saved = localStorage.getItem('skarnfell_data');
                 if (saved) {
-                    try { store = JSON.parse(saved); } catch(e){}
+                    try { store = { ...store, ...JSON.parse(saved) }; } catch(e){}
                 }
             }
 
@@ -622,24 +622,18 @@
             runSimulation();
         }
 
-        /* ==================================================================
-           ÉCRITURE / MODIFICATION SUR SUPABASE (INSERT / UPDATE)
-           ================================================================== */
         async function handleFormSubmit(e) {
             e.preventDefault();
             const { entity, id } = currentContext;
             const tableName = tableMapping[entity] || entity;
 
-            // Extraction dynamique des données saisies dans le formulaire
             let payload = {};
             document.querySelectorAll('#modal-fields input, #modal-fields select, #modal-fields textarea').forEach(input => {
                 const key = input.id.replace('f-', '');
-                payload[key] = input.type === 'number' ? parseFloat(input.value) || 0 : input.value;
+                payload[key] = input.type === 'number' ? (parseFloat(input.value) || 0) : input.value;
             });
 
-            // Nettoyage des UUIDs vides (Foreign Keys)
-            if (payload.house_id === "") payload.house_id = null;
-
+            if (payload.house_id === "" || payload.house_id === undefined) payload.house_id = null;
             if (entity === 'houses' && !payload.initial && payload.name) {
                 payload.initial = payload.name.replace('Maison ', '').charAt(0).toUpperCase();
             }
@@ -647,17 +641,13 @@
             try {
                 if (isOnline && supabase) {
                     if (id) {
-                        // UPDATE distant
                         const { error } = await supabase.from(tableName).update(payload).eq('id', id);
                         if (error) throw error;
                     } else {
-                        // INSERT distant
                         const { error } = await supabase.from(tableName).insert([payload]);
                         if (error) throw error;
                     }
                 } else {
-                    // Sauvegarde mémoire locale
-                    if (!store[entity]) store[entity] = [];
                     if (id) {
                         let item = store[entity].find(x => x.id === id);
                         if (item) Object.assign(item, payload);
@@ -670,20 +660,16 @@
 
                 closeModal();
                 await syncWithSupabase();
-
             } catch (err) {
-                alert("Erreur d'enregistrement dans la base de données : " + err.message);
+                alert("Erreur : " + err.message);
             }
         }
 
-        /* ==================================================================
-           SUPPRESSION SUR SUPABASE (DELETE)
-           ================================================================== */
         async function handleDelete() {
             const { entity, id } = currentContext;
             const tableName = tableMapping[entity] || entity;
 
-            if (id && confirm("Êtes-vous certain de vouloir abroger cet enregistrement de la base de données ?")) {
+            if (id && confirm("Supprimer cet enregistrement ?")) {
                 try {
                     if (isOnline && supabase) {
                         const { error } = await supabase.from(tableName).delete().eq('id', id);
@@ -692,18 +678,14 @@
                         store[entity] = store[entity].filter(x => x.id !== id);
                         localStorage.setItem('skarnfell_data', JSON.stringify(store));
                     }
-
                     closeModal();
                     await syncWithSupabase();
                 } catch (err) {
-                    alert("Erreur de suppression dans la base de données : " + err.message);
+                    alert("Erreur de suppression : " + err.message);
                 }
             }
         }
 
-        /* ==================================================================
-           RENDU DE L'INTERFACE UTILISATEUR & INTERACTION RELATIONNELLE
-           ================================================================== */
         function getHouseName(houseId) {
             if (!houseId) return "Couronne Royale";
             const h = store.houses.find(x => x.id === houseId);
@@ -720,18 +702,17 @@
         }
 
         function refreshUI() {
-            // Dashboard METRICS
             const total = store.houses.reduce((acc, h) => acc + Number(h.treasury || 0), 0);
             document.getElementById('dash-total-wealth').innerText = total.toLocaleString() + " cuivre";
             document.getElementById('dash-houses-count').innerText = store.houses.length;
             document.getElementById('dash-pop-count').innerText = store.population ? store.population.length : 0;
 
-            // 1. MAISONS
+            // Maisons
             let housesList = [...store.houses];
             const sortHousesVal = document.getElementById('sort-houses')?.value;
-            if (sortHousesVal === 'wealth-desc') housesList.sort((a,b) => b.treasury - a.treasury);
-            if (sortHousesVal === 'wealth-asc') housesList.sort((a,b) => a.treasury - b.treasury);
-            if (sortHousesVal === 'name-asc') housesList.sort((a,b) => a.name.localeCompare(b.name));
+            if (sortHousesVal === 'wealth-desc') housesList.sort((a,b) => (b.treasury || 0) - (a.treasury || 0));
+            if (sortHousesVal === 'wealth-asc') housesList.sort((a,b) => (a.treasury || 0) - (b.treasury || 0));
+            if (sortHousesVal === 'name-asc') housesList.sort((a,b) => (a.name||'').localeCompare(b.name||''));
 
             document.getElementById('houses-container').innerHTML = housesList.map(h => {
                 const props = store.properties.filter(p => p.house_id === h.id);
@@ -750,11 +731,10 @@
                 </div>`;
             }).join('');
 
-            // 2. MERCURIALE
+            // Mercuriale
             let mercList = [...store.mercuriale];
             const filterCat = document.getElementById('filter-mercuriale-cat')?.value;
             if (filterCat && filterCat !== 'ALL') mercList = mercList.filter(m => m.category === filterCat);
-
             const sortMerc = document.getElementById('sort-mercuriale')?.value;
             if (sortMerc === 'price-desc') mercList.sort((a,b) => b.official_price - a.official_price);
             if (sortMerc === 'price-asc') mercList.sort((a,b) => a.official_price - b.official_price);
@@ -768,7 +748,7 @@
                 </div>
             `).join('');
 
-            // 3. TAXES
+            // Taxes
             document.getElementById('taxes-container').innerHTML = store.taxes.map(t => `
                 <div class="parchment-card" style="cursor:pointer;" onclick="openTaxModal('${t.id}')">
                     <div class="card-title">${t.name} <span class="badge">${t.type}</span></div>
@@ -778,7 +758,7 @@
                 </div>
             `).join('');
 
-            // 4. PROPRIÉTÉS
+            // Propriétés
             let propList = [...store.properties];
             const filterPropHouse = document.getElementById('filter-prop-house')?.value;
             if (filterPropHouse && filterPropHouse !== 'ALL') propList = propList.filter(p => p.house_id === filterPropHouse);
@@ -791,17 +771,17 @@
                 </div>
             `).join('');
 
-            // 5. DÉCRETS
-            document.getElementById('decrees-container').innerHTML = (store.decrees || []).map(d => `
+            // Décrets
+            document.getElementById('decrees-container').innerHTML = store.decrees.map(d => `
                 <div class="parchment-card" style="cursor:pointer;" onclick="openDecreeModal('${d.id}')">
                     <div class="card-title">${d.title} <span class="badge">${d.category}</span></div>
-                    <p style="font-size:14px; color:var(--red-seal); margin-bottom:5px;"><strong>Promulgué le :</strong> ${d.effective_date}</p>
+                    <p style="font-size:14px; color:var(--red-seal); margin-bottom:5px;"><strong>Promulgué le :</strong> ${d.effective_date || 'N/A'}</p>
                     <p style="font-style:italic;">${d.content}</p>
                 </div>
             `).join('');
 
-            // 6. POPULATION
-            let popList = [...(store.population || [])];
+            // Population
+            let popList = [...store.population];
             const filterPopStatus = document.getElementById('filter-pop-status')?.value;
             if (filterPopStatus && filterPopStatus !== 'ALL') popList = popList.filter(p => p.status === filterPopStatus);
 
@@ -814,28 +794,20 @@
             `).join('');
         }
 
-        /* ==================================================================
-           SIMULATEUR ÉCONOMIQUE
-           ================================================================== */
         function runSimulation() {
-            const event = document.getElementById('sim-event').value;
-            const taxMod = parseFloat(document.getElementById('sim-tax-mod').value) || 0;
+            const event = document.getElementById('sim-event')?.value || 'normal';
+            const taxMod = parseFloat(document.getElementById('sim-tax-mod')?.value) || 0;
 
             let baseWealth = store.houses.reduce((acc, h) => acc + Number(h.treasury || 0), 0);
             let wheatPrice = 12.5;
             let tension = "Faible";
 
             if (event === 'winter') {
-                baseWealth *= 0.85;
-                wheatPrice *= 1.35;
-                tension = "Modérée";
+                baseWealth *= 0.85; wheatPrice *= 1.35; tension = "Modérée";
             } else if (event === 'war') {
-                baseWealth *= 0.60;
-                wheatPrice *= 1.5;
-                tension = "Élevée";
+                baseWealth *= 0.60; wheatPrice *= 1.5; tension = "Élevée";
             } else if (event === 'famine') {
-                wheatPrice *= 1.8;
-                tension = "Critique (Émeutes)";
+                wheatPrice *= 1.8; tension = "Critique (Émeutes)";
             }
 
             baseWealth += baseWealth * (taxMod / 100);
@@ -845,7 +817,6 @@
             document.getElementById('sim-res-tension').innerText = tension;
         }
 
-        // CONSTRUCTEUR DE SÉLECTEURS DE MAISONS
         function buildHouseSelectOptions(selectedHouseId) {
             let options = '<option value="">-- Couronne Royale --</option>';
             store.houses.forEach(h => {
@@ -854,9 +825,6 @@
             return options;
         }
 
-        /* ==================================================================
-           FORMULAIRES MODAUX DYNAMIQUES
-           ================================================================== */
         function closeModal() {
             document.getElementById('edit-modal').style.display = 'none';
         }
