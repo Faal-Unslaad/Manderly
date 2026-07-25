@@ -4,943 +4,111 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Skarnfell - Registre du Grand Argentier</title>
-    <!-- Typographies Royals -->
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
-    
-    <!-- SDK Supabase (CDN Official) -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Polices immersives -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lora:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <!-- Supabase JS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-    <style>
-        :root {
-            --bg-dark: #0f0b08;
-            --wood-dark: #1f1610;
-            --wood-medium: #322319;
-            --wood-light: #483426;
-            --parchment: #f0e6d2;
-            --parchment-dark: #d8c7a9;
-            --parchment-shadow: #bba785;
-            --gold: #d4af37;
-            --gold-bright: #f3e5ab;
-            --gold-dim: #997a23;
-            --red-seal: #7a1b14;
-            --red-bright: #a82e2e;
-            --stone-dark: #181c1f;
-            --text-dark: #1c130d;
-            --text-light: #eaddcf;
-            --font-title: 'Cinzel', serif;
-            --font-body: 'Cormorant Garamond', serif;
-            --shadow-parchment: 0 10px 30px rgba(0,0,0,0.8), inset 0 0 60px rgba(139, 115, 68, 0.25);
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-
-        body {
-            font-family: var(--font-body);
-            background-color: var(--bg-dark);
-            color: var(--text-light);
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-            font-size: 19px;
-            background-image: radial-gradient(circle at 50% 50%, rgba(38, 28, 20, 0.5) 0%, var(--bg-dark) 100%);
-        }
-
-        /* NAVIGATION LATÉRALE */
-        .sidebar {
-            width: 320px;
-            background: linear-gradient(180deg, var(--wood-dark) 0%, #0a0705 100%);
-            border-right: 2px solid var(--gold-dim);
-            display: flex;
-            flex-direction: column;
-            box-shadow: 8px 0 25px rgba(0,0,0,0.9);
-            z-index: 500;
-            position: relative;
-            flex-shrink: 0;
-        }
-
-        .sidebar-header {
-            padding: 30px 20px 20px;
-            text-align: center;
-            border-bottom: 2px solid var(--wood-light);
-            background: rgba(0,0,0,0.3);
-        }
-
-        .sidebar-header h1 {
-            font-family: var(--font-title);
-            color: var(--gold);
-            font-size: 24px;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-        }
-
-        .sidebar-header p {
-            color: var(--parchment-dark);
-            font-style: italic;
-            font-size: 15px;
-            margin-top: 5px;
-        }
-
-        .nav-menu {
-            list-style: none;
-            padding: 15px 0;
-            flex-grow: 1;
-            overflow-y: auto;
-        }
-
-        .nav-item {
-            padding: 14px 24px;
-            cursor: pointer;
-            font-family: var(--font-title);
-            font-size: 14px;
-            color: var(--parchment-dark);
-            transition: all 0.25s ease;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            border-left: 4px solid transparent;
-            text-transform: uppercase;
-            user-select: none;
-        }
-
-        .nav-item:hover {
-            background: linear-gradient(90deg, var(--wood-medium) 0%, transparent 100%);
-            color: var(--gold-bright);
-            border-left-color: var(--gold-dim);
-        }
-
-        .nav-item.active {
-            background: linear-gradient(90deg, var(--wood-light) 0%, transparent 100%);
-            color: var(--gold);
-            border-left-color: var(--gold);
-            font-weight: bold;
-        }
-
-        /* ZONE PRINCIPALE */
-        .main-content {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            position: relative;
-            z-index: 1;
-        }
-
-        .topbar {
-            height: 70px;
-            background-color: var(--stone-dark);
-            border-bottom: 2px solid var(--gold-dim);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 35px;
-        }
-
-        .content-area {
-            padding: 35px;
-            overflow-y: auto;
-            flex-grow: 1;
-        }
-
-        .view { display: none; }
-        .view.active { display: block; }
-
-        .section-title {
-            font-family: var(--font-title);
-            font-size: 26px;
-            color: var(--gold);
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            margin-bottom: 15px;
-            border-bottom: 2px solid var(--gold-dim);
-            padding-bottom: 10px;
-        }
-
-        /* BANNIÈRE DE STATUT BASE DE DONNÉES */
-        .db-status-banner {
-            padding: 8px 16px;
-            margin-bottom: 20px;
-            border-radius: 2px;
-            font-family: var(--font-title);
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .db-status-online { background-color: #1c3829; color: #85e0a3; border: 1px solid #2d6a4f; }
-        .db-status-local { background-color: #3d2b1f; color: var(--gold-bright); border: 1px solid var(--gold-dim); }
-
-        /* BARRE D'OUTILS ET RECHERCHE */
-        .toolbar {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-            background: rgba(0,0,0,0.4);
-            padding: 12px;
-            border: 1px solid var(--wood-light);
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        .toolbar label {
-            font-family: var(--font-title);
-            font-size: 13px;
-            color: var(--gold);
-        }
-
-        .toolbar-input {
-            background: var(--wood-dark);
-            border: 1px solid var(--gold-dim);
-            color: var(--text-light);
-            padding: 6px 12px;
-            font-family: var(--font-body);
-            font-size: 16px;
-        }
-
-        /* COMPOSANTS PARCHEMIN */
-        .parchment-card {
-            background-color: var(--parchment);
-            color: var(--text-dark);
-            padding: 25px;
-            border-radius: 2px;
-            box-shadow: var(--shadow-parchment);
-            border: 1px solid var(--parchment-shadow);
-            position: relative;
-            margin-bottom: 20px;
-        }
-
-        .card-title {
-            font-family: var(--font-title);
-            font-size: 19px;
-            color: var(--red-seal);
-            border-bottom: 1px solid var(--gold-dim);
-            padding-bottom: 8px;
-            margin-bottom: 15px;
-            text-transform: uppercase;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .metric-value {
-            font-size: 34px;
-            font-weight: bold;
-            font-family: var(--font-title);
-            color: var(--text-dark);
-            text-align: center;
-            margin: 10px 0;
-        }
-
-        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
-        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 20px; }
-
-        .seal {
-            width: 48px;
-            height: 48px;
-            background: radial-gradient(circle at 30% 30%, var(--red-bright), var(--red-seal));
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: var(--gold-bright);
-            font-family: var(--font-title);
-            font-weight: bold;
-            font-size: 22px;
-            border: 2px solid var(--gold-dim);
-            flex-shrink: 0;
-        }
-
-        .badge {
-            padding: 3px 8px;
-            background-color: var(--wood-medium);
-            color: var(--parchment);
-            font-size: 11px;
-            font-family: var(--font-title);
-            border-radius: 2px;
-            border: 1px solid var(--gold-dim);
-        }
-
-        .btn-royal {
-            background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dim) 100%);
-            color: var(--bg-dark);
-            border: 1px solid var(--gold-bright);
-            padding: 8px 16px;
-            font-family: var(--font-title);
-            font-weight: bold;
-            font-size: 13px;
-            cursor: pointer;
-            text-transform: uppercase;
-        }
-
-        .btn-royal:hover { background: var(--gold-bright); }
-
-        /* MODALE ÉDITION */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.85);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .modal-content { width: 550px; max-width: 90%; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; font-family: var(--font-title); font-size: 13px; color: var(--red-seal); font-weight: bold; margin-bottom: 5px; }
-        .form-control { width: 100%; padding: 8px 12px; border: 1px solid var(--gold-dim); font-family: var(--font-body); font-size: 18px; background: var(--parchment); color: var(--text-dark); }
-        select.form-control { cursor: pointer; }
-        textarea.form-control { resize: vertical; min-height: 80px; }
-        .btn-close { position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 24px; color: var(--red-seal); cursor: pointer; }
-    </style>
 </head>
 <body>
 
+    <!-- Barre latérale / Navigation -->
     <nav class="sidebar">
-        <div class="sidebar-header">
+        <div class="brand">
             <h1>Skarnfell</h1>
-            <p>Registre du Grand Argentier</p>
+            <span class="subtitle">Le Grand Argentier</span>
         </div>
-        <ul class="nav-menu">
-            <li class="nav-item active" data-target="dashboard">
-                <span>⚜</span> Tableau de Bord
-            </li>
-            <li class="nav-item" data-target="houses">
-                <span>🏰</span> Maisons Nobles
-            </li>
-            <li class="nav-item" data-target="mercuriale">
-                <span>📜</span> Mercuriale Royale
-            </li>
-            <li class="nav-item" data-target="taxes">
-                <span>⚖</span> Taxes & Impôts
-            </li>
-            <li class="nav-item" data-target="properties">
-                <span>⚓</span> Domaines & Ports
-            </li>
-            <li class="nav-item" data-target="decrees">
-                <span>✍️</span> Décrets Royaux
-            </li>
-            <li class="nav-item" data-target="population">
-                <span>👥</span> Population & Statuts
-            </li>
-            <li class="nav-item" data-target="simulator">
-                <span>🔮</span> Simulateur de Crise
-            </li>
+        <ul class="nav-links">
+            <li><a href="#" onclick="showView('dashboard')" class="active" id="nav-dashboard">Tableau de Bord</a></li>
+            <li><a href="#" onclick="showView('houses')" id="nav-houses">Maisons Nobles</a></li>
+            <li><a href="#" onclick="showView('mercuriale')" id="nav-mercuriale">La Mercuriale</a></li>
+            <li><a href="#" onclick="showView('decrees')" id="nav-decrees">Décrets Royaux</a></li>
         </ul>
+        <div class="sidebar-footer">
+            <p>An de Grâce 412</p>
+        </div>
     </nav>
 
-    <main class="main-content">
-        <header class="topbar">
-            <div style="font-family: var(--font-title); color: var(--parchment-dark);">Royaume : <strong style="color:var(--gold)">Ventrys</strong></div>
-            <div style="font-family: var(--font-title); color: var(--gold);">Lord Brynden Manderly, Grand Argentier</div>
+    <!-- Contenu Principal -->
+    <main class="content">
+        
+        <!-- En-tête (Trésor actuel) -->
+        <header class="top-bar">
+            <h2>Registre Royal</h2>
+            <div class="treasury-status">
+                <span>Trésor Couronne :</span>
+                <span id="total-wealth" class="gold-text">Chargement... 🪙</span>
+            </div>
         </header>
 
-        <div class="content-area">
-            
-            <!-- BANNIÈRE DE STATUT DE LA BASE -->
-            <div id="db-status" class="db-status-banner db-status-local">
-                <span id="db-status-text">Connexion à la base de données...</span>
-                <button class="btn-royal" style="padding: 3px 8px; font-size: 10px;" onclick="syncWithSupabase()">Actualiser la Base</button>
-            </div>
-
-            <!-- 1. VUE : TABLEAU DE BORD -->
-            <div id="view-dashboard" class="view active">
-                <h2 class="section-title">Aperçu Économique du Royaume</h2>
-                <div class="grid-3">
-                    <div class="parchment-card">
-                        <div class="card-title">Trésor Cumulé</div>
-                        <div class="metric-value" id="dash-total-wealth">0 cuivre</div>
-                        <p style="text-align: center; font-style: italic;">Renards de cuivre répertoriés</p>
-                    </div>
-                    <div class="parchment-card">
-                        <div class="card-title">Maisons Vassales</div>
-                        <div class="metric-value" id="dash-houses-count">0</div>
-                        <p style="text-align: center; font-style: italic;">Grandes Lignées sous le Sceau</p>
-                    </div>
-                    <div class="parchment-card">
-                        <div class="card-title">Sujets Recensés</div>
-                        <div class="metric-value" id="dash-pop-count">0</div>
-                        <p style="text-align: center; font-style: italic;">Sujets du Royaume</p>
-                    </div>
+        <!-- VUE : TABLEAU DE BORD -->
+        <section id="view-dashboard" class="view active">
+            <h3 class="section-title">État du Royaume</h3>
+            <div class="widgets-grid">
+                <div class="widget parchment-card">
+                    <h4>Revenus (Ce mois)</h4>
+                    <p class="big-number positive">+ 15,000 🪙</p>
+                </div>
+                <div class="widget parchment-card">
+                    <h4>Dépenses (Ce mois)</h4>
+                    <p class="big-number negative">- 4,500 🪙</p>
+                </div>
+                <div class="widget parchment-card">
+                    <h4>Maisons Alliées</h4>
+                    <p class="big-number" id="houses-count">-</p>
                 </div>
             </div>
-
-            <!-- 2. VUE : MAISONS NOBLES -->
-            <div id="view-houses" class="view">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <h2 class="section-title" style="margin: 0;">Registre des Grandes Maisons</h2>
-                    <button class="btn-royal" onclick="openHouseModal()">+ Inscrire une Maison</button>
-                </div>
-                <div class="toolbar">
-                    <label>Trier par :</label>
-                    <select id="sort-houses" class="toolbar-input" onchange="refreshUI()">
-                        <option value="wealth-desc">Trésor (Décroissant)</option>
-                        <option value="wealth-asc">Trésor (Croissant)</option>
-                        <option value="name-asc">Nom (A-Z)</option>
+            <div class="parchment-card action-panel">
+                <h4>Nouvelle écriture comptable</h4>
+                <form id="form-treasury" class="royal-form">
+                    <input type="text" id="t-reason" placeholder="Motif de la transaction" required>
+                    <input type="number" id="t-amount" placeholder="Montant" required>
+                    <select id="t-type">
+                        <option value="INCOME">Recette (+)</option>
+                        <option value="EXPENSE">Dépense (-)</option>
                     </select>
-                </div>
-                <div class="grid-2" id="houses-container"></div>
+                    <button type="submit" class="btn-royal">Sceller l'écriture</button>
+                </form>
             </div>
+        </section>
 
-            <!-- 3. VUE : MERCURIALE -->
-            <div id="view-mercuriale" class="view">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <h2 class="section-title" style="margin: 0;">Mercuriale Royale des Marchandises</h2>
-                    <button class="btn-royal" onclick="openMercurialeModal()">+ Ajouter un Article</button>
-                </div>
-                <div class="toolbar">
-                    <label>Filtrer par Catégorie :</label>
-                    <select id="filter-mercuriale-cat" class="toolbar-input" onchange="refreshUI()">
-                        <option value="ALL">Toutes les catégories</option>
-                        <option value="Graines">Graines & Grains</option>
-                        <option value="Métaux">Métaux & Minerais</option>
-                        <option value="Luxe">Produits de Luxe</option>
-                    </select>
-                    <label>Trier par :</label>
-                    <select id="sort-mercuriale" class="toolbar-input" onchange="refreshUI()">
-                        <option value="price-desc">Prix (Décroissant)</option>
-                        <option value="price-asc">Prix (Croissant)</option>
-                        <option value="name-asc">Nom (A-Z)</option>
-                    </select>
-                </div>
-                <div class="grid-3" id="mercuriale-container"></div>
+        <!-- VUE : MAISONS NOBLES -->
+        <section id="view-houses" class="view">
+            <div class="view-header">
+                <h3 class="section-title">Les Grandes Maisons</h3>
+                <button class="btn-royal" onclick="document.getElementById('modal-house').style.display='block'">+ Forger une Alliance</button>
             </div>
-
-            <!-- 4. VUE : TAXES -->
-            <div id="view-taxes" class="view">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h2 class="section-title" style="margin: 0;">Décrets Fiscaux & Redevances</h2>
-                    <button class="btn-royal" onclick="openTaxModal()">+ Établir une Taxe</button>
-                </div>
-                <div class="grid-2" id="taxes-container"></div>
+            <!-- Conteneur des cartes des maisons -->
+            <div id="houses-container" class="cards-grid">
+                <!-- Généré par JS -->
             </div>
+        </section>
 
-            <!-- 5. VUE : PROPRIÉTÉS -->
-            <div id="view-properties" class="view">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <h2 class="section-title" style="margin: 0;">Domaines, Ports et Mines</h2>
-                    <button class="btn-royal" onclick="openPropertyModal()">+ Enregistrer un Domaine</button>
-                </div>
-                <div class="toolbar">
-                    <label>Filtrer par Maison :</label>
-                    <select id="filter-prop-house" class="toolbar-input" onchange="refreshUI()">
-                        <option value="ALL">Toutes les maisons</option>
-                    </select>
-                </div>
-                <div class="grid-2" id="properties-container"></div>
+        <!-- VUE : MERCURIALE -->
+        <section id="view-mercuriale" class="view">
+            <h3 class="section-title">Le Registre des Prix</h3>
+            <div class="parchment-list" id="mercuriale-container">
+                <!-- Généré par JS -->
             </div>
+        </section>
 
-            <!-- 6. VUE : DÉCRETS ROYAUX -->
-            <div id="view-decrees" class="view">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h2 class="section-title" style="margin: 0;">Décrets & Edits de la Couronne</h2>
-                    <button class="btn-royal" onclick="openDecreeModal()">+ Promulguer un Décret</button>
-                </div>
-                <div class="grid-2" id="decrees-container"></div>
-            </div>
-
-            <!-- 7. VUE : POPULATION -->
-            <div id="view-population" class="view">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <h2 class="section-title" style="margin: 0;">Statuts Sociaux & Sujets</h2>
-                    <button class="btn-royal" onclick="openCitizenModal()">+ Recenser un Sujet</button>
-                </div>
-                <div class="toolbar">
-                    <label>Filtrer par Statut :</label>
-                    <select id="filter-pop-status" class="toolbar-input" onchange="refreshUI()">
-                        <option value="ALL">Tous les statuts</option>
-                        <option value="Serf">Serfs</option>
-                        <option value="Tenancier">Tenanciers</option>
-                        <option value="Bourgeois">Bourgeois</option>
-                        <option value="Noble">Nobles</option>
-                    </select>
-                </div>
-                <div class="grid-2" id="population-container"></div>
-            </div>
-
-            <!-- 8. VUE : SIMULATEUR -->
-            <div id="view-simulator" class="view">
-                <h2 class="section-title">Simulateur d'Impact Économique</h2>
-                <div class="parchment-card">
-                    <div class="card-title">Paramètres de la Simulation</div>
-                    <p style="margin-bottom: 15px; font-style: italic;">Simulez les conséquences d'un événement sur le trésor et l'économie sans modifier les registres officiels.</p>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;">
-                        <div class="form-group">
-                            <label>Scénario Événementiel</label>
-                            <select id="sim-event" class="form-control" onchange="runSimulation()">
-                                <option value="normal">Situation Normale</option>
-                                <option value="winter">Hiver Rigoureux (-30% Récoltes)</option>
-                                <option value="war">Guerre Féodale (+50% Entretien Armées)</option>
-                                <option value="famine">Famine & Pénurie (+80% Prix Blé)</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Modificateur de Taxe (%)</label>
-                            <input type="number" id="sim-tax-mod" class="form-control" value="0" oninput="runSimulation()">
-                        </div>
-                    </div>
-                    <hr style="margin: 15px 0; border:0; border-top:1px solid var(--gold-dim);">
-                    <div class="card-title" style="color: var(--gold-dim);">Résultats Estimés de la Projection</div>
-                    <div class="grid-3" style="margin-top: 15px;">
-                        <div style="text-align: center;">
-                            <p>Impact Trésor Global</p>
-                            <h3 id="sim-res-treasury" style="font-family: var(--font-title); font-size: 24px; color: var(--red-seal);">0 cuivre</h3>
-                        </div>
-                        <div style="text-align: center;">
-                            <p>Prix Moyen du Boisseau</p>
-                            <h3 id="sim-res-wheat" style="font-family: var(--font-title); font-size: 24px;">12.5 cuivre</h3>
-                        </div>
-                        <div style="text-align: center;">
-                            <p>Indice de Tension Sociale</p>
-                            <h3 id="sim-res-tension" style="font-family: var(--font-title); font-size: 24px;">Faible</h3>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
     </main>
 
-    <!-- MODALE ÉDITION UNIFIÉE -->
-    <div class="modal-overlay" id="edit-modal">
+    <!-- MODAL : Nouvelle Maison -->
+    <div id="modal-house" class="modal">
         <div class="modal-content parchment-card">
-            <button class="btn-close" onclick="closeModal()">✖</button>
-            <h2 class="card-title" id="modal-title">Modifier</h2>
-            <form id="modal-form">
-                <div id="modal-fields"></div>
-                <div style="display: flex; justify-content: space-between; margin-top: 20px;">
-                    <button type="button" class="btn-royal" style="background:var(--red-seal); color:#fff;" id="btn-delete" onclick="handleDelete()">Supprimer</button>
-                    <button type="submit" class="btn-royal">Enregistrer dans la Base</button>
-                </div>
+            <span class="close-btn" onclick="document.getElementById('modal-house').style.display='none'">&times;</span>
+            <h4>Créer une Maison Noble</h4>
+            <form id="form-house" class="royal-form">
+                <input type="text" id="h-name" placeholder="Nom de la Maison (ex: Targaryen)" required>
+                <input type="text" id="h-motto" placeholder="Devise">
+                <input type="text" id="h-colors" placeholder="Couleurs (ex: Noir et Rouge)">
+                <textarea id="h-desc" placeholder="Description du fief et de l'histoire..."></textarea>
+                <button type="submit" class="btn-royal">Enregistrer dans les archives</button>
             </form>
         </div>
     </div>
 
-    <!-- MOTEUR JS -->
-    <script>
-        const SUPABASE_URL = 'https://keeqmcmbcnltsgizwsrz.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtlZXFtY21iY25sdHNnaXp3c3J6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ5OTQwMzEsImV4cCI6MjEwMDU3MDAzMX0.g6sJKXMJ9EMCIaqyFpcMIHMW9FWmNanLSZOONS3mySY';
-        
-        let supabase = null;
-        let isOnline = false;
-
-        let store = {
-            houses: [],
-            mercuriale: [],
-            taxes: [],
-            properties: [],
-            decrees: [],
-            population: []
-        };
-
-        const tableMapping = {
-            houses: 'noble_houses',
-            mercuriale: 'market_prices',
-            taxes: 'taxes',
-            properties: 'properties',
-            decrees: 'royal_decrees',
-            population: 'citizens'
-        };
-
-        let currentContext = { entity: '', id: null };
-
-        // Attachement direct de la navigation
-        function bindNavigation() {
-            const items = document.querySelectorAll('.nav-item');
-            items.forEach(item => {
-                item.onclick = function() {
-                    const targetViewId = this.getAttribute('data-target');
-                    
-                    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-                    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-                    
-                    const targetView = document.getElementById('view-' + targetViewId);
-                    if (targetView) {
-                        targetView.classList.add('active');
-                        this.classList.add('active');
-                    }
-                };
-            });
-        }
-
-        window.onload = function() {
-            bindNavigation();
-
-            const modalForm = document.getElementById('modal-form');
-            if (modalForm) {
-                modalForm.onsubmit = handleFormSubmit;
-            }
-
-            if (window.supabase && SUPABASE_KEY.startsWith('eyJ')) {
-                try {
-                    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-                    isOnline = true;
-                    document.getElementById('db-status').className = 'db-status-banner db-status-online';
-                    document.getElementById('db-status-text').innerHTML = 'Mode : <strong>PostgreSQL distant (Connecté)</strong>';
-                } catch(e) {
-                    console.warn("Connexion Supabase échouée", e);
-                }
-            } else {
-                document.getElementById('db-status').className = 'db-status-banner db-status-local';
-                document.getElementById('db-status-text').innerHTML = 'Mode : <strong>Mémoire Locale</strong>';
-            }
-
-            syncWithSupabase();
-        };
-
-        async function syncWithSupabase() {
-            if (isOnline && supabase) {
-                try {
-                    const [resHouses, resMerc, resTaxes, resProps, resDecrees, resPop] = await Promise.all([
-                        supabase.from('noble_houses').select('*'),
-                        supabase.from('market_prices').select('*'),
-                        supabase.from('taxes').select('*'),
-                        supabase.from('properties').select('*'),
-                        supabase.from('royal_decrees').select('*'),
-                        supabase.from('citizens').select('*')
-                    ]);
-
-                    if (!resHouses.error) store.houses = resHouses.data || [];
-                    if (!resMerc.error) store.mercuriale = resMerc.data || [];
-                    if (!resTaxes.error) store.taxes = resTaxes.data || [];
-                    if (!resProps.error) store.properties = resProps.data || [];
-                    if (!resDecrees.error) store.decrees = resDecrees.data || [];
-                    if (!resPop.error) store.population = resPop.data || [];
-
-                    localStorage.setItem('skarnfell_data', JSON.stringify(store));
-                } catch (err) {
-                    console.error("Erreur DB:", err);
-                }
-            } else {
-                const saved = localStorage.getItem('skarnfell_data');
-                if (saved) {
-                    try { store = { ...store, ...JSON.parse(saved) }; } catch(e){}
-                }
-            }
-
-            populateHouseFilters();
-            refreshUI();
-            runSimulation();
-        }
-
-        async function handleFormSubmit(e) {
-            e.preventDefault();
-            const { entity, id } = currentContext;
-            const tableName = tableMapping[entity] || entity;
-
-            let payload = {};
-            document.querySelectorAll('#modal-fields input, #modal-fields select, #modal-fields textarea').forEach(input => {
-                const key = input.id.replace('f-', '');
-                payload[key] = input.type === 'number' ? (parseFloat(input.value) || 0) : input.value;
-            });
-
-            if (payload.house_id === "" || payload.house_id === undefined) payload.house_id = null;
-            if (entity === 'houses' && !payload.initial && payload.name) {
-                payload.initial = payload.name.replace('Maison ', '').charAt(0).toUpperCase();
-            }
-
-            try {
-                if (isOnline && supabase) {
-                    if (id) {
-                        const { error } = await supabase.from(tableName).update(payload).eq('id', id);
-                        if (error) throw error;
-                    } else {
-                        const { error } = await supabase.from(tableName).insert([payload]);
-                        if (error) throw error;
-                    }
-                } else {
-                    if (id) {
-                        let item = store[entity].find(x => x.id === id);
-                        if (item) Object.assign(item, payload);
-                    } else {
-                        payload.id = 'loc_' + Date.now();
-                        store[entity].push(payload);
-                    }
-                    localStorage.setItem('skarnfell_data', JSON.stringify(store));
-                }
-
-                closeModal();
-                await syncWithSupabase();
-            } catch (err) {
-                alert("Erreur : " + err.message);
-            }
-        }
-
-        async function handleDelete() {
-            const { entity, id } = currentContext;
-            const tableName = tableMapping[entity] || entity;
-
-            if (id && confirm("Supprimer cet enregistrement ?")) {
-                try {
-                    if (isOnline && supabase) {
-                        const { error } = await supabase.from(tableName).delete().eq('id', id);
-                        if (error) throw error;
-                    } else {
-                        store[entity] = store[entity].filter(x => x.id !== id);
-                        localStorage.setItem('skarnfell_data', JSON.stringify(store));
-                    }
-                    closeModal();
-                    await syncWithSupabase();
-                } catch (err) {
-                    alert("Erreur de suppression : " + err.message);
-                }
-            }
-        }
-
-        function getHouseName(houseId) {
-            if (!houseId) return "Couronne Royale";
-            const h = store.houses.find(x => x.id === houseId);
-            return h ? h.name : "Couronne Royale";
-        }
-
-        function populateHouseFilters() {
-            const filterProp = document.getElementById('filter-prop-house');
-            if (!filterProp) return;
-            const currentVal = filterProp.value;
-            filterProp.innerHTML = '<option value="ALL">Toutes les maisons</option>' + 
-                store.houses.map(h => `<option value="${h.id}">${h.name}</option>`).join('');
-            filterProp.value = currentVal;
-        }
-
-        function refreshUI() {
-            const total = store.houses.reduce((acc, h) => acc + Number(h.treasury || 0), 0);
-            document.getElementById('dash-total-wealth').innerText = total.toLocaleString() + " cuivre";
-            document.getElementById('dash-houses-count').innerText = store.houses.length;
-            document.getElementById('dash-pop-count').innerText = store.population ? store.population.length : 0;
-
-            // Maisons
-            let housesList = [...store.houses];
-            const sortHousesVal = document.getElementById('sort-houses')?.value;
-            if (sortHousesVal === 'wealth-desc') housesList.sort((a,b) => (b.treasury || 0) - (a.treasury || 0));
-            if (sortHousesVal === 'wealth-asc') housesList.sort((a,b) => (a.treasury || 0) - (b.treasury || 0));
-            if (sortHousesVal === 'name-asc') housesList.sort((a,b) => (a.name||'').localeCompare(b.name||''));
-
-            document.getElementById('houses-container').innerHTML = housesList.map(h => {
-                const props = store.properties.filter(p => p.house_id === h.id);
-                return `
-                <div class="parchment-card" style="cursor:pointer;" onclick="openHouseModal('${h.id}')">
-                    <div style="display:flex; align-items:center; gap:15px;">
-                        <div class="seal">${h.initial || (h.name ? h.name.charAt(0) : 'M')}</div>
-                        <div>
-                            <h3 style="font-family:var(--font-title); font-size:20px;">${h.name}</h3>
-                            <p style="font-style:italic;">"${h.motto || ''}"</p>
-                        </div>
-                    </div>
-                    <hr style="margin: 10px 0; border:0; border-top:1px solid var(--gold-dim);">
-                    <p><strong>Trésor :</strong> ${Number(h.treasury || 0).toLocaleString()} cuivre</p>
-                    <p style="font-size:14px; margin-top:5px;"><strong>Domaines :</strong> ${props.length > 0 ? props.map(p=>p.name).join(', ') : 'Aucun'}</p>
-                </div>`;
-            }).join('');
-
-            // Mercuriale
-            let mercList = [...store.mercuriale];
-            const filterCat = document.getElementById('filter-mercuriale-cat')?.value;
-            if (filterCat && filterCat !== 'ALL') mercList = mercList.filter(m => m.category === filterCat);
-            const sortMerc = document.getElementById('sort-mercuriale')?.value;
-            if (sortMerc === 'price-desc') mercList.sort((a,b) => b.official_price - a.official_price);
-            if (sortMerc === 'price-asc') mercList.sort((a,b) => a.official_price - b.official_price);
-            if (sortMerc === 'name-asc') mercList.sort((a,b) => (a.item_name || '').localeCompare(b.item_name || ''));
-
-            document.getElementById('mercuriale-container').innerHTML = mercList.map(m => `
-                <div class="parchment-card" style="cursor:pointer;" onclick="openMercurialeModal('${m.id}')">
-                    <div class="card-title">${m.item_name} <span class="badge">${m.category}</span></div>
-                    <div class="metric-value">${m.official_price} cuivre</div>
-                    <p style="text-align:center;">Par ${m.unit}</p>
-                </div>
-            `).join('');
-
-            // Taxes
-            document.getElementById('taxes-container').innerHTML = store.taxes.map(t => `
-                <div class="parchment-card" style="cursor:pointer;" onclick="openTaxModal('${t.id}')">
-                    <div class="card-title">${t.name} <span class="badge">${t.type}</span></div>
-                    <p><strong>Bénéficiaire :</strong> ${getHouseName(t.house_id)}</p>
-                    <p><strong>Taux :</strong> ${t.rate_percentage}%</p>
-                    <p style="font-style:italic;">${t.description || ''}</p>
-                </div>
-            `).join('');
-
-            // Propriétés
-            let propList = [...store.properties];
-            const filterPropHouse = document.getElementById('filter-prop-house')?.value;
-            if (filterPropHouse && filterPropHouse !== 'ALL') propList = propList.filter(p => p.house_id === filterPropHouse);
-
-            document.getElementById('properties-container').innerHTML = propList.map(p => `
-                <div class="parchment-card" style="cursor:pointer;" onclick="openPropertyModal('${p.id}')">
-                    <div class="card-title">${p.name} <span class="badge">${p.type}</span></div>
-                    <p><strong>Maison Suzeraine :</strong> ${getHouseName(p.house_id)}</p>
-                    <p><strong>Valeur :</strong> ${Number(p.estimated_value || 0).toLocaleString()} cuivre</p>
-                </div>
-            `).join('');
-
-            // Décrets
-            document.getElementById('decrees-container').innerHTML = store.decrees.map(d => `
-                <div class="parchment-card" style="cursor:pointer;" onclick="openDecreeModal('${d.id}')">
-                    <div class="card-title">${d.title} <span class="badge">${d.category}</span></div>
-                    <p style="font-size:14px; color:var(--red-seal); margin-bottom:5px;"><strong>Promulgué le :</strong> ${d.effective_date || 'N/A'}</p>
-                    <p style="font-style:italic;">${d.content}</p>
-                </div>
-            `).join('');
-
-            // Population
-            let popList = [...store.population];
-            const filterPopStatus = document.getElementById('filter-pop-status')?.value;
-            if (filterPopStatus && filterPopStatus !== 'ALL') popList = popList.filter(p => p.status === filterPopStatus);
-
-            document.getElementById('population-container').innerHTML = popList.map(p => `
-                <div class="parchment-card" style="cursor:pointer;" onclick="openCitizenModal('${p.id}')">
-                    <div class="card-title">${p.name} <span class="badge">${p.status}</span></div>
-                    <p><strong>Profession :</strong> ${p.profession}</p>
-                    <p><strong>Allégeance :</strong> ${getHouseName(p.house_id)}</p>
-                </div>
-            `).join('');
-        }
-
-        function runSimulation() {
-            const event = document.getElementById('sim-event')?.value || 'normal';
-            const taxMod = parseFloat(document.getElementById('sim-tax-mod')?.value) || 0;
-
-            let baseWealth = store.houses.reduce((acc, h) => acc + Number(h.treasury || 0), 0);
-            let wheatPrice = 12.5;
-            let tension = "Faible";
-
-            if (event === 'winter') {
-                baseWealth *= 0.85; wheatPrice *= 1.35; tension = "Modérée";
-            } else if (event === 'war') {
-                baseWealth *= 0.60; wheatPrice *= 1.5; tension = "Élevée";
-            } else if (event === 'famine') {
-                wheatPrice *= 1.8; tension = "Critique (Émeutes)";
-            }
-
-            baseWealth += baseWealth * (taxMod / 100);
-
-            document.getElementById('sim-res-treasury').innerText = Math.round(baseWealth).toLocaleString() + " cuivre";
-            document.getElementById('sim-res-wheat').innerText = wheatPrice.toFixed(1) + " cuivre";
-            document.getElementById('sim-res-tension').innerText = tension;
-        }
-
-        function buildHouseSelectOptions(selectedHouseId) {
-            let options = '<option value="">-- Couronne Royale --</option>';
-            store.houses.forEach(h => {
-                options += `<option value="${h.id}" ${h.id === selectedHouseId ? 'selected' : ''}>${h.name}</option>`;
-            });
-            return options;
-        }
-
-        function closeModal() {
-            document.getElementById('edit-modal').style.display = 'none';
-        }
-
-        function showModal(title, fieldsHTML, entity, id) {
-            currentContext = { entity, id };
-            document.getElementById('modal-title').innerText = title;
-            document.getElementById('modal-fields').innerHTML = fieldsHTML;
-            document.getElementById('btn-delete').style.display = id ? 'block' : 'none';
-            document.getElementById('edit-modal').style.display = 'flex';
-        }
-
-        function openHouseModal(id = null) {
-            const item = id ? store.houses.find(h => h.id === id) : { name: '', motto: '', treasury: 0 };
-            const fields = `
-                <div class="form-group"><label>Nom de la Maison</label><input type="text" id="f-name" class="form-control" value="${item.name || ''}" required></div>
-                <div class="form-group"><label>Devise</label><input type="text" id="f-motto" class="form-control" value="${item.motto || ''}"></div>
-                <div class="form-group"><label>Trésor (cuivre)</label><input type="number" id="f-treasury" class="form-control" value="${item.treasury || 0}"></div>
-            `;
-            showModal(id ? "Modifier Maison" : "Nouvelle Maison", fields, 'houses', id);
-        }
-
-        function openMercurialeModal(id = null) {
-            const item = id ? store.mercuriale.find(m => m.id === id) : { item_name: '', category: 'Graines', official_price: 10, unit: 'boisseau' };
-            const fields = `
-                <div class="form-group"><label>Marchandise</label><input type="text" id="f-item_name" class="form-control" value="${item.item_name || ''}" required></div>
-                <div class="form-group">
-                    <label>Catégorie</label>
-                    <select id="f-category" class="form-control">
-                        <option value="Graines" ${item.category === 'Graines' ? 'selected' : ''}>Graines & Grains</option>
-                        <option value="Métaux" ${item.category === 'Métaux' ? 'selected' : ''}>Métaux & Minerais</option>
-                        <option value="Luxe" ${item.category === 'Luxe' ? 'selected' : ''}>Produits de Luxe</option>
-                    </select>
-                </div>
-                <div class="form-group"><label>Prix Officiel (cuivre)</label><input type="number" step="0.1" id="f-official_price" class="form-control" value="${item.official_price || 0}"></div>
-                <div class="form-group"><label>Unité de mesure</label><input type="text" id="f-unit" class="form-control" value="${item.unit || ''}"></div>
-            `;
-            showModal(id ? "Ajuster Prix" : "Nouvel Article", fields, 'mercuriale', id);
-        }
-
-        function openTaxModal(id = null) {
-            const item = id ? store.taxes.find(t => t.id === id) : { name: '', type: 'Impôt', rate_percentage: 5, house_id: '', description: '' };
-            const fields = `
-                <div class="form-group"><label>Intitulé de la Taxe</label><input type="text" id="f-name" class="form-control" value="${item.name || ''}" required></div>
-                <div class="form-group">
-                    <label>Type de Prélèvement</label>
-                    <select id="f-type" class="form-control">
-                        <option value="Impôt" ${item.type === 'Impôt' ? 'selected' : ''}>Impôt Direct</option>
-                        <option value="Péage" ${item.type === 'Péage' ? 'selected' : ''}>Péage / Octroi</option>
-                        <option value="Dîme" ${item.type === 'Dîme' ? 'selected' : ''}>Dîme</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Maison Bénéficiaire</label>
-                    <select id="f-house_id" class="form-control">${buildHouseSelectOptions(item.house_id)}</select>
-                </div>
-                <div class="form-group"><label>Taux (%)</label><input type="number" step="0.1" id="f-rate_percentage" class="form-control" value="${item.rate_percentage || 0}"></div>
-                <div class="form-group"><label>Description</label><input type="text" id="f-description" class="form-control" value="${item.description || ''}"></div>
-            `;
-            showModal(id ? "Modifier Taxe" : "Nouvelle Taxe", fields, 'taxes', id);
-        }
-
-        function openPropertyModal(id = null) {
-            const item = id ? store.properties.find(p => p.id === id) : { name: '', type: 'Port', estimated_value: 10000, house_id: '' };
-            const fields = `
-                <div class="form-group"><label>Nom Domaine</label><input type="text" id="f-name" class="form-control" value="${item.name || ''}" required></div>
-                <div class="form-group">
-                    <label>Type de Domaine</label>
-                    <select id="f-type" class="form-control">
-                        <option value="Port" ${item.type === 'Port' ? 'selected' : ''}>Port / Quai</option>
-                        <option value="Mine" ${item.type === 'Mine' ? 'selected' : ''}>Mine de Minerai</option>
-                        <option value="Forêt" ${item.type === 'Forêt' ? 'selected' : ''}>Forêt Seigneuriale</option>
-                        <option value="Ferme" ${item.type === 'Ferme' ? 'selected' : ''}>Ferme / Moulin</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Maison Suzeraine</label>
-                    <select id="f-house_id" class="form-control">${buildHouseSelectOptions(item.house_id)}</select>
-                </div>
-                <div class="form-group"><label>Valeur Estimée (cuivre)</label><input type="number" id="f-estimated_value" class="form-control" value="${item.estimated_value || 0}"></div>
-            `;
-            showModal(id ? "Modifier Domaine" : "Nouveau Domaine", fields, 'properties', id);
-        }
-
-        function openDecreeModal(id = null) {
-            const item = id ? store.decrees.find(d => d.id === id) : { title: '', category: 'Agriculture', effective_date: '', content: '' };
-            const fields = `
-                <div class="form-group"><label>Titre du Décret</label><input type="text" id="f-title" class="form-control" value="${item.title || ''}" required></div>
-                <div class="form-group"><label>Catégorie</label><input type="text" id="f-category" class="form-control" value="${item.category || ''}"></div>
-                <div class="form-group"><label>Date d'entrée en vigueur</label><input type="date" id="f-effective_date" class="form-control" value="${item.effective_date || ''}"></div>
-                <div class="form-group"><label>Contenu de l'Édit</label><textarea id="f-content" class="form-control">${item.content || ''}</textarea></div>
-            `;
-            showModal(id ? "Modifier Décret" : "Nouveau Décret", fields, 'decrees', id);
-        }
-
-        function openCitizenModal(id = null) {
-            const item = id ? store.population.find(p => p.id === id) : { name: '', status: 'Tenancier', profession: '', house_id: '' };
-            const fields = `
-                <div class="form-group"><label>Nom du Sujet</label><input type="text" id="f-name" class="form-control" value="${item.name || ''}" required></div>
-                <div class="form-group">
-                    <label>Statut Social</label>
-                    <select id="f-status" class="form-control">
-                        <option value="Serf" ${item.status === 'Serf' ? 'selected' : ''}>Serf Attitré</option>
-                        <option value="Tenancier" ${item.status === 'Tenancier' ? 'selected' : ''}>Tenancier / Fermier</option>
-                        <option value="Bourgeois" ${item.status === 'Bourgeois' ? 'selected' : ''}>Bourgeois Marchand</option>
-                        <option value="Noble" ${item.status === 'Noble' ? 'selected' : ''}>Haute Noblesse</option>
-                    </select>
-                </div>
-                <div class="form-group"><label>Profession</label><input type="text" id="f-profession" class="form-control" value="${item.profession || ''}"></div>
-                <div class="form-group">
-                    <label>Maison d'Allégeance</label>
-                    <select id="f-house_id" class="form-control">${buildHouseSelectOptions(item.house_id)}</select>
-                </div>
-            `;
-            showModal(id ? "Modifier Sujet" : "Recenser Sujet", fields, 'population', id);
-        }
-    </script>
+    <script src="app.js"></script>
 </body>
 </html>
