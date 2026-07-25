@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skarnfell - Registre du Grand Argentier</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0f0b08;
+            --wood-dark: #1f1610;
+            --wood-medium: #322319;
+            --wood-light: #483426;
+            --parchment: #f0e6d2;
+            --parchment-dark: #d8c7a9;
+            --parchment-shadow: #bba785;
+            --gold: #d4af37;
+            --gold-bright: #f3e5ab;
+            --gold-dim: #997a23;
+            --red-seal: #7a1b14;
+            --red-bright: #a82e2e;
+            --stone-dark: #181c1f;
+            --text-dark: #1c130d;
+            --text-light: #eaddcf;
+            --font-title: 'Cinzel', serif;
+            --font-body: 'Cormorant Garamond', serif;
+            --shadow-parchment: 0 10px 30px rgba(0,0,0,0.8), inset 0 0 60px rgba(139, 115, 68, 0.25);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            font-size: 19px;
+            background-image: radial-gradient(circle at 50% 50%, rgba(38, 28, 20, 0.5) 0%, var(--bg-dark) 100%);
+        }
+
+        /* NAVIGATION LATÉRALE */
+        .sidebar {
+            width: 310px;
+            background: linear-gradient(180deg, var(--wood-dark) 0%, #0a0705 100%);
+            border-right: 2px solid var(--gold-dim);
+            display: flex;
+            flex-direction: column;
+            box-shadow: 8px 0 25px rgba(0,0,0,0.9);
+            z-index: 20;
+        }
+
+        .sidebar-header {
+            padding: 35px 20px 25px;
+            text-align: center;
+            border-bottom: 2px solid var(--wood-light);
+            background: rgba(0,0,0,0.3);
+        }
+
+        .sidebar-header h1 {
+            font-family: var(--font-title);
+            color: var(--gold);
+            font-size: 26px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        .sidebar-header p {
+            color: var(--parchment-dark);
+            font-style: italic;
+            font-size: 16px;
+            margin-top: 5px;
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 20px 0;
+            flex-grow: 1;
+        }
+
+        .nav-item {
+            padding: 16px 28px;
+            cursor: pointer;
+            font-family: var(--font-title);
+            font-size: 15px;
+            color: var(--parchment-dark);
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-left: 4px solid transparent;
+            text-transform: uppercase;
+            user-select: none;
+        }
+
+        .nav-item:hover {
+            background: linear-gradient(90deg, var(--wood-medium) 0%, transparent 100%);
+            color: var(--gold-bright);
+            border-left-color: var(--gold-dim);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(90deg, var(--wood-light) 0%, transparent 100%);
+            color: var(--gold);
+            border-left-color: var(--gold);
+            font-weight: bold;
+        }
+
+        /* ZONE PRINCIPALE */
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .topbar {
+            height: 75px;
+            background-color: var(--stone-dark);
+            border-bottom: 2px solid var(--gold-dim);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 40px;
+        }
+
+        .content-area {
+            padding: 40px;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+
+        .view { display: none; }
+        .view.active { display: block; }
+
+        .section-title {
+            font-family: var(--font-title);
+            font-size: 28px;
+            color: var(--gold);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--gold-dim);
+            padding-bottom: 10px;
+        }
+
+        /* COMPOSANTS PARCHEMIN */
+        .parchment-card {
+            background-color: var(--parchment);
+            color: var(--text-dark);
+            padding: 30px;
+            border-radius: 2px;
+            box-shadow: var(--shadow-parchment);
+            border: 1px solid var(--parchment-shadow);
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        .card-title {
+            font-family: var(--font-title);
+            font-size: 20px;
+            color: var(--red-seal);
+            border-bottom: 1px solid var(--gold-dim);
+            padding-bottom: 8px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .metric-value {
+            font-size: 38px;
+            font-weight: bold;
+            font-family: var(--font-title);
+            color: var(--text-dark);
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; }
+        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 25px; }
+
+        .seal {
+            width: 50px;
+            height: 50px;
+            background: radial-gradient(circle at 30% 30%, var(--red-bright), var(--red-seal));
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--gold-bright);
+            font-family: var(--font-title);
+            font-weight: bold;
+            font-size: 24px;
+            border: 2px solid var(--gold-dim);
+            flex-shrink: 0;
+        }
+
+        .badge {
+            padding: 3px 10px;
+            background-color: var(--wood-medium);
+            color: var(--parchment);
+            font-size: 12px;
+            font-family: var(--font-title);
+            border-radius: 2px;
+            border: 1px solid var(--gold-dim);
+        }
+
+        .btn-royal {
+            background: linear-gradient(180deg, var(--gold) 0%, var(--gold-dim) 100%);
+            color: var(--bg-dark);
+            border: 1px solid var(--gold-bright);
+            padding: 8px 18px;
+            font-family: var(--font-title);
+            font-weight: bold;
+            font-size: 13px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        .btn-royal:hover { background: var(--gold-bright); }
+
+        /* MODALE */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content { width: 550px; max-width: 90%; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-family: var(--font-title); font-size: 13px; color: var(--red-seal); font-weight: bold; margin-bottom: 5px; }
+        .form-control { width: 100%; padding: 8px 12px; border: 1px solid var(--gold-dim); font-family: var(--font-body); font-size: 18px; background: transparent; }
+        .btn-close { position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 24px; color: var(--red-seal); cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h1>Skarnfell</h1>
+            <p>Registre du Grand Argentier</p>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item active" data-target="dashboard">
+                <span>⚜</span> Tableau de Bord
+            </li>
+            <li class="nav-item" data-target="houses">
+                <span>🏰</span> Maisons Nobles
+            </li>
+            <li class="nav-item" data-target="mercuriale">
+                <span>📜</span> Mercuriale Royale
+            </li>
+            <li class="nav-item" data-target="taxes">
+                <span>⚖</span> Taxes & Impôts
+            </li>
+            <li class="nav-item" data-target="properties">
+                <span>⚓</span> Domaines & Ports
+            </li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+        <header class="topbar">
+            <div style="font-family: var(--font-title); color: var(--parchment-dark);">Royaume : <strong style="color:var(--gold)">Ventrys</strong></div>
+            <div style="font-family: var(--font-title); color: var(--gold);">Lord Brynden Manderly, Grand Argentier</div>
+        </header>
+
+        <div class="content-area">
+            
+            <!-- 1. VUE : TABLEAU DE BORD -->
+            <div id="view-dashboard" class="view active">
+                <h2 class="section-title">Aperçu Économique du Royaume</h2>
+                <div class="grid-3">
+                    <div class="parchment-card">
+                        <div class="card-title">Trésor Cumulé</div>
+                        <div class="metric-value" id="dash-total-wealth">0 cuivre</div>
+                        <p style="text-align: center; font-style: italic;">Renards de cuivre</p>
+                    </div>
+                    <div class="parchment-card">
+                        <div class="card-title">Maisons Vassales</div>
+                        <div class="metric-value" id="dash-houses-count">0</div>
+                        <p style="text-align: center; font-style: italic;">Grandes Lignées sous le Sceau</p>
+                    </div>
+                    <div class="parchment-card">
+                        <div class="card-title">Marchandises</div>
+                        <div class="metric-value" id="dash-items-count">0</div>
+                        <p style="text-align: center; font-style: italic;">Articles fixés à la Mercuriale</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. VUE : MAISONS NOBLES -->
+            <div id="view-houses" class="view">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 class="section-title" style="margin: 0;">Registre des Grandes Maisons</h2>
+                    <button class="btn-royal" onclick="openHouseModal()">+ Inscrire une Maison</button>
+                </div>
+                <div class="grid-2" id="houses-container"></div>
+            </div>
+
+            <!-- 3. VUE : MERCURIALE -->
+            <div id="view-mercuriale" class="view">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 class="section-title" style="margin: 0;">Mercuriale Royale des Marchandises</h2>
+                    <button class="btn-royal" onclick="openMercurialeModal()">+ Ajouter un Article</button>
+                </div>
+                <div class="grid-3" id="mercuriale-container"></div>
+            </div>
+
+            <!-- 4. VUE : TAXES -->
+            <div id="view-taxes" class="view">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 class="section-title" style="margin: 0;">Décrets Fiscaux & Redevances</h2>
+                    <button class="btn-royal" onclick="openTaxModal()">+ Établir une Taxe</button>
+                </div>
+                <div class="grid-2" id="taxes-container"></div>
+            </div>
+
+            <!-- 5. VUE : PROPRIÉTÉS -->
+            <div id="view-properties" class="view">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 class="section-title" style="margin: 0;">Domaines, Ports et Mines</h2>
+                    <button class="btn-royal" onclick="openPropertyModal()">+ Enregistrer un Domaine</button>
+                </div>
+                <div class="grid-2" id="properties-container"></div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- MODALE ÉDITION UNIFIÉE -->
+    <div class="modal-overlay" id="edit-modal">
+        <div class="modal-content parchment-card">
+            <button class="btn-close" onclick="closeModal()">✖</button>
+            <h2 class="card-title" id="modal-title">Modifier</h2>
+            <form id="modal-form">
+                <div id="modal-fields"></div>
+                <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+                    <button type="button" class="btn-royal" style="background:var(--red-seal); color:#fff;" id="btn-delete" onclick="handleDelete()">Supprimer</button>
+                    <button type="submit" class="btn-royal">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // DONNÉES EN MÉMOIRE
+        let store = {
+            houses: [
+                { id: '1', name: "Maison Stark", motto: "L'hiver vient", treasury: 45000, initial: "S" },
+                { id: '2', name: "Maison Lannister", motto: "Je rugis !", treasury: 850000, initial: "L" },
+                { id: '3', name: "Maison Tyrell", motto: "Plus haut, plus fort", treasury: 620000, initial: "T" }
+            ],
+            mercuriale: [
+                { id: '1', item_name: "Blé d'Or de la Reître", category: "Graines", official_price: 12.5, unit: "boisseau" },
+                { id: '2', item_name: "Fer Brut des Mines", category: "Métaux", official_price: 45.0, unit: "lingot" }
+            ],
+            taxes: [
+                { id: '1', name: "Droit de Quai de BlancheLande", type: "Péage", rate_percentage: 5.0, description: "Sur chaque navire marchand." }
+            ],
+            properties: [
+                { id: '1', name: "Port de BlancheLande", type: "Port", estimated_value: 120000 }
+            ]
+        };
+
+        let currentContext = { entity: '', id: null };
+
+        // INITIALISATION SÉCURISÉE DES ÉVÉNEMENTS
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // 1. ATTACHEMENT SÛR DE LA NAVIGATION
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const targetViewId = this.getAttribute('data-target');
+                    
+                    // Masquer toutes les vues
+                    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+                    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                    
+                    // Activer la vue cliquée
+                    const targetView = document.getElementById('view-' + targetViewId);
+                    if (targetView) {
+                        targetView.classList.add('active');
+                        this.classList.add('active');
+                    }
+                });
+            });
+
+            // 2. FORMULAIRE DE MODALE
+            document.getElementById('modal-form').addEventListener('submit', handleFormSubmit);
+
+            // Charger données locales si existantes
+            const saved = localStorage.getItem('skarnfell_data');
+            if (saved) {
+                try { store = JSON.parse(saved); } catch(e){}
+            }
+
+            refreshUI();
+        });
+
+        function saveData() {
+            localStorage.setItem('skarnfell_data', JSON.stringify(store));
+            refreshUI();
+        }
+
+        function refreshUI() {
+            // Dashboard
+            const total = store.houses.reduce((acc, h) => acc + Number(h.treasury || 0), 0);
+            document.getElementById('dash-total-wealth').innerText = total.toLocaleString() + " cuivre";
+            document.getElementById('dash-houses-count').innerText = store.houses.length;
+            document.getElementById('dash-items-count').innerText = store.mercuriale.length;
+
+            // Maisons
+            document.getElementById('houses-container').innerHTML = store.houses.map(h => `
+                <div class="parchment-card" style="cursor:pointer;" onclick="openHouseModal('${h.id}')">
+                    <div style="display:flex; align-items:center; gap:15px;">
+                        <div class="seal">${h.initial || h.name.charAt(0)}</div>
+                        <div>
+                            <h3 style="font-family:var(--font-title); font-size:20px;">${h.name}</h3>
+                            <p style="font-style:italic;">"${h.motto || ''}"</p>
+                        </div>
+                    </div>
+                    <hr style="margin: 10px 0; border:0; border-top:1px solid var(--gold-dim);">
+                    <p><strong>Trésor :</strong> ${Number(h.treasury || 0).toLocaleString()} cuivre</p>
+                </div>
+            `).join('');
+
+            // Mercuriale
+            document.getElementById('mercuriale-container').innerHTML = store.mercuriale.map(m => `
+                <div class="parchment-card" style="cursor:pointer;" onclick="openMercurialeModal('${m.id}')">
+                    <div class="card-title">${m.item_name} <span class="badge">${m.category}</span></div>
+                    <div class="metric-value">${m.official_price} cuivre</div>
+                    <p style="text-align:center;">Par ${m.unit}</p>
+                </div>
+            `).join('');
+
+            // Taxes
+            document.getElementById('taxes-container').innerHTML = store.taxes.map(t => `
+                <div class="parchment-card" style="cursor:pointer;" onclick="openTaxModal('${t.id}')">
+                    <div class="card-title">${t.name} <span class="badge">${t.type}</span></div>
+                    <p><strong>Taux :</strong> ${t.rate_percentage}%</p>
+                    <p style="font-style:italic;">${t.description || ''}</p>
+                </div>
+            `).join('');
+
+            // Propriétés
+            document.getElementById('properties-container').innerHTML = store.properties.map(p => `
+                <div class="parchment-card" style="cursor:pointer;" onclick="openPropertyModal('${p.id}')">
+                    <div class="card-title">${p.name} <span class="badge">${p.type}</span></div>
+                    <p><strong>Valeur :</strong> ${Number(p.estimated_value || 0).toLocaleString()} cuivre</p>
+                </div>
+            `).join('');
+        }
+
+        // GESTION MODALE & FORMULAIRES
+        function closeModal() {
+            document.getElementById('edit-modal').style.display = 'none';
+        }
+
+        function showModal(title, fieldsHTML, entity, id) {
+            currentContext = { entity, id };
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-fields').innerHTML = fieldsHTML;
+            document.getElementById('btn-delete').style.display = id ? 'block' : 'none';
+            document.getElementById('edit-modal').style.display = 'flex';
+        }
+
+        function openHouseModal(id = null) {
+            const item = id ? store.houses.find(h => h.id === id) : { name: '', motto: '', treasury: 0 };
+            const fields = `
+                <div class="form-group"><label>Nom</label><input type="text" id="f-name" class="form-control" value="${item.name}" required></div>
+                <div class="form-group"><label>Devise</label><input type="text" id="f-motto" class="form-control" value="${item.motto}"></div>
+                <div class="form-group"><label>Trésor (cuivre)</label><input type="number" id="f-treasury" class="form-control" value="${item.treasury}"></div>
+            `;
+            showModal(id ? "Modifier Maison" : "Nouvelle Maison", fields, 'houses', id);
+        }
+
+        function openMercurialeModal(id = null) {
+            const item = id ? store.mercuriale.find(m => m.id === id) : { item_name: '', category: 'Graines', official_price: 10, unit: 'boisseau' };
+            const fields = `
+                <div class="form-group"><label>Marchandise</label><input type="text" id="f-item_name" class="form-control" value="${item.item_name}" required></div>
+                <div class="form-group"><label>Catégorie</label><input type="text" id="f-category" class="form-control" value="${item.category}"></div>
+                <div class="form-group"><label>Prix (cuivre)</label><input type="number" step="0.1" id="f-official_price" class="form-control" value="${item.official_price}"></div>
+                <div class="form-group"><label>Unité</label><input type="text" id="f-unit" class="form-control" value="${item.unit}"></div>
+            `;
+            showModal(id ? "Ajuster Prix" : "Nouvel Article", fields, 'mercuriale', id);
+        }
+
+        function openTaxModal(id = null) {
+            const item = id ? store.taxes.find(t => t.id === id) : { name: '', type: 'Impôt', rate_percentage: 5, description: '' };
+            const fields = `
+                <div class="form-group"><label>Nom Taxe</label><input type="text" id="f-name" class="form-control" value="${item.name}" required></div>
+                <div class="form-group"><label>Type</label><input type="text" id="f-type" class="form-control" value="${item.type}"></div>
+                <div class="form-group"><label>Taux (%)</label><input type="number" step="0.1" id="f-rate_percentage" class="form-control" value="${item.rate_percentage}"></div>
+                <div class="form-group"><label>Description</label><input type="text" id="f-description" class="form-control" value="${item.description}"></div>
+            `;
+            showModal(id ? "Modifier Taxe" : "Nouvelle Taxe", fields, 'taxes', id);
+        }
+
+        function openPropertyModal(id = null) {
+            const item = id ? store.properties.find(p => p.id === id) : { name: '', type: 'Port', estimated_value: 10000 };
+            const fields = `
+                <div class="form-group"><label>Nom Domaine</label><input type="text" id="f-name" class="form-control" value="${item.name}" required></div>
+                <div class="form-group"><label>Type</label><input type="text" id="f-type" class="form-control" value="${item.type}"></div>
+                <div class="form-group"><label>Valeur (cuivre)</label><input type="number" id="f-estimated_value" class="form-control" value="${item.estimated_value}"></div>
+            `;
+            showModal(id ? "Modifier Domaine" : "Nouveau Domaine", fields, 'properties', id);
+        }
+
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            const { entity, id } = currentContext;
+            let item = id ? store[entity].find(x => x.id === id) : { id: Date.now().toString() };
+
+            document.querySelectorAll('#modal-fields input').forEach(input => {
+                const key = input.id.replace('f-', '');
+                item[key] = input.type === 'number' ? parseFloat(input.value) || 0 : input.value;
+            });
+
+            if (entity === 'houses' && !item.initial) {
+                item.initial = item.name.replace('Maison ', '').charAt(0).toUpperCase();
+            }
+
+            if (!id) store[entity].push(item);
+            saveData();
+            closeModal();
+        }
+
+        function handleDelete() {
+            const { entity, id } = currentContext;
+            if (id && confirm("Supprimer cet élément ?")) {
+                store[entity] = store[entity].filter(x => x.id !== id);
+                saveData();
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>
