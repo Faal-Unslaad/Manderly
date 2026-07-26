@@ -4,5 +4,5 @@ import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  base: 'Faal-Unslaad/Manderly', // IMPORTANT : Nom du repo GitHub
+  base: 'Faal-Unslaad/Manderly', // IMPORTANT : Nom du repo GitHub.
 });
