@@ -1,116 +1,272 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skarnfell - Registre du Grand Argentier</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="style.css">
-    <!-- Polices immersives -->
-    <!-- Import Google Fonts avec support latin-ext complet -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lora:ital,wght@0,400;0,700;1,400&display=swap&subset=latin-ext" rel="stylesheet">    <!-- Supabase JS -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <title>Trésor Royal de Skarnfell - État du Royaume</title>
 </head>
 <body>
-
-    <!-- Barre latérale / Navigation -->
-    <nav class="sidebar">
-        <div class="brand">
-            <h1>Skarnfell</h1>
-            <span class="subtitle">Le Grand Argentier</span>
-        </div>
-        <ul class="nav-links">
-    <li><a href="javascript:void(0);" onclick="showView('dashboard')" class="active" id="nav-dashboard">Tableau de Bord</a></li>
-    <li><a href="javascript:void(0);" onclick="showView('houses')" id="nav-houses">Maisons Nobles</a></li>
-    <li><a href="javascript:void(0);" onclick="showView('mercuriale')" id="nav-mercuriale">La Mercuriale</a></li>
-    <li><a href="javascript:void(0);" onclick="showView('decrees')" id="nav-decrees">Décrets Royaux</a></li>
-</ul>
-        <div class="sidebar-footer">
-            <p>An de Grâce 412</p>
-        </div>
-    </nav>
-
-    <!-- Contenu Principal -->
-    <main class="content">
+    <div class="app-shell">
+        <div class="grain" aria-hidden="true"></div>
         
-        <!-- En-tête (Trésor actuel) -->
-        <header class="top-bar">
-            <h2>Registre Royal</h2>
-            <div class="treasury-status">
-                <span>Trésor Couronne :</span>
-                <span id="total-wealth" class="gold-text">Chargement... 🪙</span>
-            </div>
-        </header>
-
-        <!-- VUE : TABLEAU DE BORD -->
-        <section id="view-dashboard" class="view active">
-            <h3 class="section-title">État du Royaume</h3>
-            <div class="widgets-grid">
-                <div class="widget parchment-card">
-                    <h4>Revenus (Ce mois)</h4>
-                    <p class="big-number positive">+ 15,000 🪙</p>
+        <!-- Barre Latérale -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-mark">
+                    <!-- Icône Château -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 5V3"></path><path d="M14 5V3"></path><path d="M15 21v-3a3 3 0 0 0-6 0v3"></path><path d="M18 3v8"></path><path d="M18 5H6"></path><path d="M22 11H2"></path><path d="M22 9v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9"></path><path d="M6 3v8"></path></svg>
                 </div>
-                <div class="widget parchment-card">
-                    <h4>Dépenses (Ce mois)</h4>
-                    <p class="big-number negative">- 4,500 🪙</p>
-                </div>
-                <div class="widget parchment-card">
-                    <h4>Maisons Alliées</h4>
-                    <p class="big-number" id="houses-count">-</p>
+                <div>
+                    <strong>SKARNFELL</strong>
+                    <span>Trésor de la Couronne</span>
                 </div>
             </div>
-            <div class="parchment-card action-panel">
-                <h4>Nouvelle écriture comptable</h4>
-                <form id="form-treasury" class="royal-form">
-                    <input type="text" id="t-reason" placeholder="Motif de la transaction" required>
-                    <input type="number" id="t-amount" placeholder="Montant" required>
-                    <select id="t-type">
-                        <option value="INCOME">Recette (+)</option>
-                        <option value="EXPENSE">Dépense (-)</option>
-                    </select>
-                    <button type="submit" class="btn-royal">Sceller l'écriture</button>
-                </form>
+            <div class="royal-divider"><i></i><span>✦</span><i></i></div>
+            <nav>
+                <div>
+                    <button class="active">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 18v-7"></path><path d="M11.12 2.198a2 2 0 0 1 1.76.006l7.866 3.847c.476.233.31.949-.22.949H3.474c-.53 0-.695-.716-.22-.949z"></path><path d="M14 18v-7"></path><path d="M18 18v-7"></path><path d="M3 22h18"></path><path d="M6 18v-7"></path></svg>
+                        <span>Vue du royaume</span><b></b>
+                    </button>
+                </div>
+                <div>
+                    <p class="nav-group">Registres</p>
+                    <button><span>Mercuriale</span></button>
+                </div>
+                <div>
+                    <button><span>Taxes & droits</span></button>
+                </div>
+                <div>
+                    <button><span>Gestion féodale</span></button>
+                </div>
+                <div>
+                    <button><span>Maisons nobles</span></button>
+                </div>
+                <div>
+                    <button><span>Propriétés</span></button>
+                </div>
+                <div>
+                    <p class="nav-group">Grand Conseil</p>
+                    <button><span>Économie</span></button>
+                </div>
+                <div>
+                    <button><span>Versions</span></button>
+                </div>
+                <div>
+                    <button><span>Journal royal</span></button>
+                </div>
+                <div>
+                    <button><span>Décrets royaux</span></button>
+                </div>
+                <div>
+                    <button><span>Simulateur</span></button>
+                </div>
+                <div>
+                    <button><span>Permissions</span></button>
+                </div>
+            </nav>
+            <div class="sidebar-foot">
+                <span class="wax-seal">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"></path><path d="M5 21h14"></path></svg>
+                </span>
+                <div>
+                    <strong>Registre scellé</strong>
+                    <small>Synchronisé à l’instant</small>
+                </div>
             </div>
-        </section>
+        </aside>
 
-        <!-- VUE : MAISONS NOBLES -->
-        <section id="view-houses" class="view">
-            <div class="view-header">
-                <h3 class="section-title">Les Grandes Maisons</h3>
-                <button class="btn-royal" onclick="document.getElementById('modal-house').style.display='block'">+ Forger une Alliance</button>
+        <!-- Contenu Principal -->
+        <main class="main-stage">
+            <header class="topbar">
+                <div class="search-wrap">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21 21-4.34-4.34"></path><circle cx="11" cy="11" r="8"></circle></svg>
+                    <input placeholder="Rechercher dans les registres…" value="">
+                    <kbd>⌘ K</kbd>
+                </div>
+                <div class="top-actions">
+                    <button class="icon-button" aria-label="Alertes">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg><i></i>
+                    </button>
+                    <div class="profile-seal">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"></path><path d="M5 21h14"></path></svg>
+                        <span><strong>Lord Vaelor</strong><small>Grand Argentier</small></span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-wrap">
+                <!-- En-tête de la page -->
+                <div class="page-heading">
+                    <div>
+                        <span class="eyebrow">Grand Registre • An 306</span>
+                        <h1>État du Royaume</h1>
+                        <p>Synthèse économique et fiscale présentée au Conseil restreint.</p>
+                    </div>
+                    <div class="heading-actions">
+                        <button class="button compact">Rapport</button>
+                        <button class="button primary">
+                            Nouveau décret
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 1. Grille de Statistiques (4 colonnes) -->
+                <div class="stat-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">👑</div>
+                        <div>
+                            <span>Revenus de la Couronne</span>
+                            <strong>247 600 ¤</strong>
+                            <small class="trend positive">+10.6 % depuis la dernière lune</small>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🛡️</div>
+                        <div>
+                            <span>Recettes des Maisons</span>
+                            <strong>162 200 ¤</strong>
+                            <small class="trend positive">+4.8 % six maisons déclarantes</small>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">⚖️</div>
+                        <div>
+                            <span>Impôts Perçus</span>
+                            <strong>13 200 ¤</strong>
+                            <small class="trend stable">100 % des rôles actifs</small>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">⚓</div>
+                        <div>
+                            <span>Ports & Fermages</span>
+                            <strong>85 400 ¤</strong>
+                            <small class="trend positive">+7.6 % droits, loyers et redevances</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Grille Principale (Tableau de bord) -->
+                <div class="dashboard-grid">
+                    
+                    <!-- Colonne Gauche -->
+                    <div style="display: flex; flex-direction: column; gap: 17px;">
+                        
+                        <!-- Graphique Évolution -->
+                        <section class="panel">
+                            <div class="panel-title">
+                                <div>
+                                    <h2>Évolution des recettes</h2>
+                                    <p>Sept dernières lunes</p>
+                                </div>
+                                <button>Mensuel ⌄</button>
+                            </div>
+                            <div class="chart-main">
+                                <!-- Espace réservé pour le canvas du graphique (Chart.js ou D3.js) -->
+                            </div>
+                        </section>
+
+                        <!-- Derniers Changements (Timeline) -->
+                        <section class="panel">
+                            <div class="panel-title">
+                                <div>
+                                    <h2>Derniers changements</h2>
+                                    <p>Actes économiques enregistrés</p>
+                                </div>
+                                <button>Tout voir ⌄</button>
+                            </div>
+                            <div class="timeline">
+                                <div>
+                                    <span>◆</span>
+                                    <div>
+                                        <p><strong>Le prix du Fer brut passe de 7.00 à 7.2 cuivres.</strong></p>
+                                        <small>Grand Argentier - registre mercuriale</small>
+                                    </div>
+                                </div>
+                                <div>
+                                    <span>◆</span>
+                                    <div>
+                                        <p><strong>Le prix du fer passe de 6 à 7 cuivres.</strong></p>
+                                        <small>Grand Argentier - registre mercuriale</small>
+                                    </div>
+                                </div>
+                                <div>
+                                    <span>◆</span>
+                                    <div>
+                                        <p><strong>La taxe portuaire augmente de 2.5 % à 3.5 %.</strong></p>
+                                        <small>Maître des Lois - registre fiscalité</small>
+                                    </div>
+                                </div>
+                                <div>
+                                    <span>◆</span>
+                                    <div>
+                                        <p><strong>Création du statut de Tenancier.</strong></p>
+                                        <small>Greffier royal - registre statuts</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+
+                    <!-- Colonne Droite -->
+                    <div style="display: flex; flex-direction: column; gap: 17px;">
+                        
+                        <!-- Graphique Maisons -->
+                        <section class="panel">
+                            <div class="panel-title">
+                                <div>
+                                    <h2>Recettes par maison</h2>
+                                    <p>Contributions déclarées</p>
+                                </div>
+                            </div>
+                            <div class="chart-box">
+                                <!-- Espace réservé pour le graphique en barres -->
+                            </div>
+                        </section>
+
+                        <!-- Alertes -->
+                        <section class="panel">
+                            <div class="panel-title">
+                                <div>
+                                    <h2>Vigilance du Trésor</h2>
+                                    <p>Trois affaires réclamant votre sceau</p>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="alert-row danger">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>
+                                    <div>
+                                        <strong>Réserves de sel en baisse</strong>
+                                        <span>Blancport - seuil critique sous 18 jours</span>
+                                    </div>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"></path></svg>
+                                </div>
+                                <div class="alert-row warning">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 8v4"></path><path d="M12 16h.01"></path></svg>
+                                    <div>
+                                        <strong>Retard de collecte</strong>
+                                        <span>Maison Karstark - 1 240 ¤ attendus</span>
+                                    </div>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"></path></svg>
+                                </div>
+                                <div class="alert-row neutral">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path><path d="M16 13H8"></path><path d="M16 17H8"></path><path d="M10 9H8"></path></svg>
+                                    <div>
+                                        <strong>Décret à promulguer</strong>
+                                        <span>Réforme des droits d'amarrage</span>
+                                    </div>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"></path></svg>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+
+                </div>
             </div>
-            <!-- Conteneur des cartes des maisons -->
-            <div id="houses-container" class="cards-grid">
-                <!-- Généré par JS -->
-            </div>
-        </section>
-
-        <!-- VUE : MERCURIALE -->
-        <section id="view-mercuriale" class="view">
-            <h3 class="section-title">Le Registre des Prix</h3>
-            <div class="parchment-list" id="mercuriale-container">
-                <!-- Généré par JS -->
-            </div>
-        </section>
-
-    </main>
-
-    <!-- MODAL : Nouvelle Maison -->
-    <div id="modal-house" class="modal">
-        <div class="modal-content parchment-card">
-            <span class="close-btn" onclick="document.getElementById('modal-house').style.display='none'">&times;</span>
-            <h4>Créer une Maison Noble</h4>
-            <form id="form-house" class="royal-form">
-                <input type="text" id="h-name" placeholder="Nom de la Maison (ex: Targaryen)" required>
-                <input type="text" id="h-motto" placeholder="Devise">
-                <input type="text" id="h-colors" placeholder="Couleurs (ex: Noir et Rouge)">
-                <textarea id="h-desc" placeholder="Description du fief et de l'histoire..."></textarea>
-                <button type="submit" class="btn-royal">Enregistrer dans les archives</button>
-            </form>
-        </div>
+        </main>
     </div>
-
-    <script src="app.js"></script>
 </body>
 </html>
