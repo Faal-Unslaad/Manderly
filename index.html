@@ -6,8 +6,10 @@
     <title>Skarnfell - Registre du Grand Argentier</title>
     <link rel="stylesheet" href="style.css">
     <!-- Polices immersives -->
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lora:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-    <!-- Supabase JS -->
+    <!-- Import Google Fonts avec support latin-ext complet -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lora:ital,wght@0,400;0,700;1,400&display=swap&subset=latin-ext" rel="stylesheet">    <!-- Supabase JS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -19,11 +21,11 @@
             <span class="subtitle">Le Grand Argentier</span>
         </div>
         <ul class="nav-links">
-            <li><a href="#" onclick="showView('dashboard')" class="active" id="nav-dashboard">Tableau de Bord</a></li>
-            <li><a href="#" onclick="showView('houses')" id="nav-houses">Maisons Nobles</a></li>
-            <li><a href="#" onclick="showView('mercuriale')" id="nav-mercuriale">La Mercuriale</a></li>
-            <li><a href="#" onclick="showView('decrees')" id="nav-decrees">Décrets Royaux</a></li>
-        </ul>
+    <li><a href="javascript:void(0);" onclick="showView('dashboard')" class="active" id="nav-dashboard">Tableau de Bord</a></li>
+    <li><a href="javascript:void(0);" onclick="showView('houses')" id="nav-houses">Maisons Nobles</a></li>
+    <li><a href="javascript:void(0);" onclick="showView('mercuriale')" id="nav-mercuriale">La Mercuriale</a></li>
+    <li><a href="javascript:void(0);" onclick="showView('decrees')" id="nav-decrees">Décrets Royaux</a></li>
+</ul>
         <div class="sidebar-footer">
             <p>An de Grâce 412</p>
         </div>

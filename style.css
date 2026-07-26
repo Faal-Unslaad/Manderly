@@ -25,9 +25,15 @@ body {
     overflow: hidden;
 }
 
-h1, h2, h3, h4, .cinzel {
+/* Séparation stricte pour éviter les ruptures de police sur les accents */
+h1, h2, h3, .cinzel {
     font-family: 'Cinzel', serif;
     font-weight: 700;
+}
+
+/* On utilise Lora (très lisible et accentuée) pour les sous-titres h4, h5, h6 et le texte */
+body, p, span, h4, h5, h6, input, select, textarea, button {
+    font-family: 'Lora', serif;
 }
 
 /* Sidebar */
