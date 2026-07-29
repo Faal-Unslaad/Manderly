@@ -1,1 +1,230 @@
-yo
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>La Mercuriale de Bourgogne - Grand Marché</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Importation de polices médiévales et classiques depuis Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Uncial+Antiqua&family=Cinzel:wght@600&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Cadre décoratif extérieur -->
+  <div class="parchment-border">
+    <!-- Contenu du parchemin -->
+    <main class="parchment">
+      
+      <!-- En-tête -->
+      <header>
+        <div class="header-ornament">✦ ⚜ ✦</div>
+        <h1>Mercuriale du Marché</h1>
+        <p class="subtitle">Registre officiel des prix, denrées et vivres establis en cette bonne ville</p>
+        <div class="header-ornament">✦ ⚜ ✦</div>
+      </header>
+
+      <!-- Boutons de filtres / Catégories -->
+      <nav class="tags-filter">
+        <button class="filter-btn active" data-filter="all">Toutes les denrées</button>
+        <button class="filter-btn" data-filter="materiaux">Matériaux bruts</button>
+        <button class="filter-btn" data-filter="nourriture">Nourriture</button>
+        <button class="filter-btn" data-filter="outils">Outils</button>
+        <button class="filter-btn" data-filter="vetements">Vêtements</button>
+      </nav>
+
+      <!-- LISTE DES ARTICLES (La Mercuriale) -->
+      <!-- Vous pouvez ajouter, modifier ou désordonner les articles ci-dessous. 
+           Ils seront automatiquement triés par catégorie et par ordre alphabétique ! -->
+      <section id="mercuriale-list">
+        
+        <!-- MATÉRIAUX BRUTS -->
+        <div class="article" data-tag="materiaux">
+          <span class="nom">Pierre de taille (calcaire)</span>
+          <span class="prix">14 deniers</span>
+          <span class="unite">la charrette</span>
+        </div>
+        <div class="article" data-tag="materiaux">
+          <span class="nom">Bois de chêne sec</span>
+          <span class="prix">8 sols</span>
+          <span class="unite">la corde</span>
+        </div>
+        <div class="article" data-tag="materiaux">
+          <span class="nom">Fer forgé en lingot</span>
+          <span class="prix">2 livres</span>
+          <span class="unite">le quintal</span>
+        </div>
+        <div class="article" data-tag="materiaux">
+          <span class="nom">Argile rouge de potier</span>
+          <span class="prix">5 deniers</span>
+          <span class="unite">le boisseau</span>
+        </div>
+
+        <!-- NOURRITURE -->
+        <div class="article" data-tag="nourriture">
+          <span class="nom">Œufs de poule fermière</span>
+          <span class="prix">3 deniers</span>
+          <span class="unite">la douzaine</span>
+        </div>
+        <div class="article" data-tag="nourriture">
+          <span class="nom">Huile de noix pressée</span>
+          <span class="prix">12 deniers</span>
+          <span class="unite">la pinte</span>
+        </div>
+        <div class="article" data-tag="nourriture">
+          <span class="nom">Fromage à pâte dure</span>
+          <span class="prix">6 deniers</span>
+          <span class="unite">les deux</span>
+        </div>
+        <div class="article" data-tag="nourriture">
+          <span class="nom">Grains de blé d'hiver</span>
+          <span class="prix">1 sol, 4 deniers</span>
+          <span class="unite">le setier</span>
+        </div>
+        <div class="article" data-tag="nourriture">
+          <span class="nom">Vin rouge de table</span>
+          <span class="prix">8 deniers</span>
+          <span class="unite">le pichet</span>
+        </div>
+
+        <!-- OUTILS -->
+        <div class="article" data-tag="outils">
+          <span class="nom">Faux à manche de frêne</span>
+          <span class="prix">1 sol, 6 deniers</span>
+          <span class="unite">pièce</span>
+        </div>
+        <div class="article" data-tag="outils">
+          <span class="nom">Clous de charpentier</span>
+          <span class="prix">4 deniers</span>
+          <span class="unite">la centaine</span>
+        </div>
+        <div class="article" data-tag="outils">
+          <span class="nom">Hache de bûcheron</span>
+          <span class="prix">2 sols</span>
+          <span class="unite">pièce</span>
+        </div>
+
+        <!-- VÊTEMENTS -->
+        <div class="article" data-tag="vetements">
+          <span class="nom">Tunique de lin écru</span>
+          <span class="prix">3 sols</span>
+          <span class="unite">pièce</span>
+        </div>
+        <div class="article" data-tag="vetements">
+          <span class="nom">Chausses en laine fine</span>
+          <span class="prix">1 sol, 8 deniers</span>
+          <span class="unite">la paire</span>
+        </div>
+        <div class="article" data-tag="vetements">
+          <span class="nom">Drap de laine bordeaux</span>
+          <span class="prix">4 sols</span>
+          <span class="unite">l'aune</span>
+        </div>
+        <div class="article" data-tag="vetements">
+          <span class="nom">Ceinture de cuir tanné</span>
+          <span class="prix">10 deniers</span>
+          <span class="unite">pièce</span>
+        </div>
+
+      </section>
+
+      <!-- Pied de parchemin -->
+      <footer>
+        <p>Scellé par les Consuls de la Guilde et le Prévôt des Marchands.</p>
+        <div class="seal">✠</div>
+      </footer>
+
+    </main>
+  </div>
+
+  <!-- Script pour le tri (par sorte puis par ordre alphabétique) et le filtrage -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const container = document.getElementById("mercuriale-list");
+      const articles = Array.from(container.getElementsByClassName("article"));
+      const filterButtons = document.querySelectorAll(".filter-btn");
+
+      // Ordre des catégories imposé
+      const tagOrder = {
+        "materiaux": 1,
+        "nourriture": 2,
+        "outils": 3,
+        "vetements": 4
+      };
+
+      const tagTitles = {
+        "materiaux": "─ ✧ Matériaux Bruts ✧ ─",
+        "nourriture": "─ ✧ Nourriture & Vivres ✧ ─",
+        "outils": "─ ✧ Outils & Outillage ✧ ─",
+        "vetements": "─ ✧ Vêtements & Étoffes ✧ ─"
+      };
+
+      // 1. TRI : par catégorie d'abord, puis par ordre alphabétique du nom de l'article
+      articles.sort((a, b) => {
+        const tagA = a.getAttribute("data-tag") || "";
+        const tagB = b.getAttribute("data-tag") || "";
+        const orderA = tagOrder[tagA] || 99;
+        const orderB = tagOrder[tagB] || 99;
+
+        if (orderA !== orderB) {
+          return orderA - orderB;
+        }
+        
+        const nomA = a.querySelector(".nom").textContent.trim().toLowerCase();
+        const nomB = b.querySelector(".nom").textContent.trim().toLowerCase();
+        return nomA.localeCompare(nomB, "fr");
+      });
+
+      // 2. Ré-injection dans le HTML avec des titres de catégories
+      container.innerHTML = "";
+      let currentTag = "";
+
+      articles.forEach(article => {
+        const tag = article.getAttribute("data-tag");
+        if (tag !== currentTag) {
+          currentTag = tag;
+          const header = document.createElement("h2");
+          header.className = "category-title";
+          header.setAttribute("data-category", currentTag);
+          header.textContent = tagTitles[currentTag] || currentTag;
+          container.appendChild(header);
+        }
+        container.appendChild(article);
+      });
+
+      // 3. Système de filtre interactif au clic sur un tag
+      filterButtons.forEach(btn => {
+        btn.addEventListener("click", () => {
+          filterButtons.forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+
+          const filterValue = btn.getAttribute("data-filter");
+          const allArticles = container.querySelectorAll(".article");
+          const allHeaders = container.querySelectorAll(".category-title");
+
+          if (filterValue === "all") {
+            allArticles.forEach(el => el.style.display = "flex");
+            allHeaders.forEach(el => el.style.display = "block");
+          } else {
+            allHeaders.forEach(el => {
+              if (el.getAttribute("data-category") === filterValue) {
+                el.style.display = "block";
+              } else {
+                el.style.display = "none";
+              }
+            });
+            allArticles.forEach(el => {
+              if (el.getAttribute("data-tag") === filterValue) {
+                el.style.display = "flex";
+              } else {
+                el.style.display = "none";
+              }
+            });
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>
