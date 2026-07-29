@@ -185,19 +185,22 @@ h1 {
 
 .unite {
   order: 4;
-  font-style: italic;
+  font-family: var(--font-title);
+  /*font-style: italic;*/
   color: var(--faded-ink);
   font-size: 1rem;
   margin-left: 0.4rem;
   white-space: nowrap;
 }
 
+/*
 .unite::before {
   content: "(";
 }
 .unite::after {
   content: ")";
 }
+*/
 
 /* --- PIED DE PAGE --- */
 footer {
