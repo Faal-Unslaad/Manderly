@@ -185,7 +185,7 @@ h1 {
 
 .unite {
   order: 4;
-  font-family: var(--font-title);
+  font-family: var(--font-heading);
   /*font-style: italic;*/
   color: var(--faded-ink);
   font-size: 1rem;
@@ -193,14 +193,12 @@ h1 {
   white-space: nowrap;
 }
 
-/*
 .unite::before {
   content: "(";
 }
 .unite::after {
   content: ")";
 }
-*/
 
 /* --- PIED DE PAGE --- */
 footer {
